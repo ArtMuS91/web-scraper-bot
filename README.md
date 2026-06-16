@@ -1,2 +1,55 @@
 # web-scraper-bot
-Web scraper for vacancies with telegram bot notification
+
+A Python bot that scrapes job vacancies from [DOU.ua](https://jobs.dou.ua/) and sends a formatted digest to a Telegram chat.
+
+## Features
+
+- Scrapes remote vacancies from DOU.ua with a configurable search query
+- Parses Ukrainian-language dates and sorts vacancies by date (newest first)
+- Highlights "hot" vacancies with a 🔥 icon
+- Sends results as an HTML-formatted Telegram message
+
+## Project Structure
+
+```
+web-scraper-bot.py   # Entry point — orchestrates scraping and Telegram delivery
+models.py            # Vacancy dataclass with HTML rendering
+utils.py             # Ukrainian date parser
+scrapers/
+  dou.py             # DOU.ua scraper (requests + BeautifulSoup)
+```
+
+## Requirements
+
+- Python 3.10+
+- Dependencies: `requests`, `beautifulsoup4`, `python-telegram-bot`, `python-dotenv`
+
+Install dependencies:
+
+```bash
+pip install requests beautifulsoup4 python-telegram-bot python-dotenv
+```
+
+## Configuration
+
+Create a `.env` file in the project root:
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token_here
+TELEGRAM_CHAT_ID=your_chat_id_here
+```
+
+## Usage
+
+```bash
+python web-scraper-bot.py
+```
+
+The script scrapes each configured URL, builds an HTML digest, and sends it to the configured Telegram chat.
+
+## Adding More Scrapers
+
+1. Create a new file under `scrapers/` that returns a `list[Vacancy]`.
+2. Register the scraper in the `SCRAPERS` dict in `web-scraper-bot.py`.
+3. Add an entry to the `URLS` list with the matching `type` key.
+
