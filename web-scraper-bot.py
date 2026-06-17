@@ -1,14 +1,31 @@
-import asyncio
+import logging
 import os
-from telegram import Bot
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes
+)
 from dotenv import load_dotenv
 
 from scrapers.dou import scrape_dou
 
 load_dotenv()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+if not TELEGRAM_BOT_TOKEN:
+    raise RuntimeError("TELEGRAM_BOT_TOKEN is not set")
+
+if not TELEGRAM_CHAT_ID:
+    raise RuntimeError("TELEGRAM_CHAT_ID is not set")
+
+TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
 URLS = [
     {"type": "DOU", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"}
@@ -37,21 +54,47 @@ def scrape():
 
     return "\n".join(results)
 
-async def send_to_telegram(text):
-    bot = Bot(token=TELEGRAM_BOT_TOKEN)
-    await bot.send_message(
-        chat_id=TELEGRAM_CHAT_ID,
-        text=text,
-        parse_mode="HTML"
+def allowed(update):
+    return update.effective_chat.id == TELEGRAM_CHAT_ID
+
+async def run_command(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+    if not allowed(update) or update.message is None:
+        return
+
+    await update.message.reply_text(
+        "⏳ Running scraper..."
     )
 
-async def main():
-    data = scrape()
-    # print(data)
-    await send_to_telegram(data)
+    result = scrape()
+
+    await update.message.reply_text(result, parse_mode="HTML")
+
+async def status(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE
+):
+    if not allowed(update) or update.message is None:
+        return
+
+    await update.message.reply_text(
+        "✅ Bot is running"
+    )
+
+app = Application.builder().token(
+    TELEGRAM_BOT_TOKEN
+).build()
+
+app.add_handler(
+    CommandHandler("run", run_command)
+)
+
+app.add_handler(
+    CommandHandler("status", status)
+)
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print(f"Error: {e}")
+    logging.info("Starting Telegram bot...")
+    app.run_polling()
