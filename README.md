@@ -49,6 +49,16 @@ APP_ENV=local
 
 This project is hosted on [Render](https://render.com/) and is configured to deploy automatically whenever changes are merged into the `main` branch.
 
+## Testing
+
+Run the test suite locally with:
+
+```bash
+pytest
+```
+
+GitHub Actions runs the tests on every pull request and blocks merging if any test fails.
+
 ## Usage
 
 ```bash
