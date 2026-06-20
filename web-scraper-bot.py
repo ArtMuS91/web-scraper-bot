@@ -18,12 +18,17 @@ logging.basicConfig(
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
+PORT = int(os.getenv("PORT", "8443"))
 
 if not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("TELEGRAM_BOT_TOKEN is not set")
 
 if not TELEGRAM_CHAT_ID:
     raise RuntimeError("TELEGRAM_CHAT_ID is not set")
+
+if not WEBHOOK_URL:
+    raise RuntimeError("WEBHOOK_URL is not set")
 
 TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
@@ -36,6 +41,7 @@ SCRAPERS = {
 }
 
 def scrape():
+    """Parse all provided URLS and prepare data for sending"""
     results = []
 
     for entry in URLS:
@@ -96,5 +102,9 @@ app.add_handler(
 )
 
 if __name__ == "__main__":
-    logging.info("Starting Telegram bot...")
-    app.run_polling()
+    logging.info("Starting Telegram bot via webhook...")
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=WEBHOOK_URL,
+    )
