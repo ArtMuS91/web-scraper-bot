@@ -8,6 +8,7 @@ from telegram.ext import (
 )
 from dotenv import load_dotenv
 
+from scrapers.djinni import scrape_djinni
 from scrapers.dou import scrape_dou
 from scrapers.workua import scrape_workua
 
@@ -36,12 +37,14 @@ TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
 URLS = [
     {"type": "DOU", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"},
-    {"type": "WORKUA", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"}
+    {"type": "WORKUA", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"},
+    {"type": "DJINNI", "url": "https://djinni.co/jobs/?search_type=basic-search&employment=remote&editorial=reservation"},
 ]
 
 SCRAPERS = {
     "DOU": scrape_dou,
     "WORKUA": scrape_workua,
+    "DJINNI": scrape_djinni
 }
 
 def scrape():
@@ -52,12 +55,12 @@ def scrape():
         url_type = entry["type"]
         url = entry["url"]
 
-        results.append(f"{url_type} вакансії (ремоут, з бронюванням):\n")
-
         scraper = SCRAPERS.get(url_type)
         if scraper is None:
             print(f"No scraper found for type '{url_type}', skipping.")
             continue
+        
+        results.append(f"{url_type} вакансії (ремоут, з бронюванням):\n")
 
         vacancies = scraper(url)
         results.extend(v.to_html(i) for i, v in enumerate(vacancies, start=1))
