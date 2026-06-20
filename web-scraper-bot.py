@@ -20,6 +20,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 PORT = int(os.getenv("PORT", "8443"))
+APP_ENV = os.getenv("APP_ENV", "production").strip().lower()
 
 if not TELEGRAM_BOT_TOKEN:
     raise RuntimeError("TELEGRAM_BOT_TOKEN is not set")
@@ -27,8 +28,8 @@ if not TELEGRAM_BOT_TOKEN:
 if not TELEGRAM_CHAT_ID:
     raise RuntimeError("TELEGRAM_CHAT_ID is not set")
 
-if not WEBHOOK_URL:
-    raise RuntimeError("WEBHOOK_URL is not set")
+if APP_ENV != "local" and not WEBHOOK_URL:
+    raise RuntimeError("WEBHOOK_URL is not set when APP_ENV is not 'local'")
 
 TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
@@ -102,9 +103,13 @@ app.add_handler(
 )
 
 if __name__ == "__main__":
-    logging.info("Starting Telegram bot via webhook...")
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=WEBHOOK_URL,
-    )
+    if APP_ENV == "local":
+        logging.info("Starting Telegram bot via polling (local mode)...")
+        app.run_polling()
+    else:
+        logging.info("Starting Telegram bot via webhook...")
+        app.run_webhook(
+            listen="0.0.0.0",
+            port=PORT,
+            webhook_url=WEBHOOK_URL,
+        )

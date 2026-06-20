@@ -15,7 +15,7 @@ def scrape_dou(url: str) -> list[Vacancy]:
     soup = BeautifulSoup(r.text, "html.parser")
 
     vacancies: list[Vacancy] = []
-    for item in soup.select('.l-vacancy'):
+    for item in soup.select('.l-vacancy', limit=10):
         a_tag = item.select_one('a.vt')
         date_text = item.select_one('.date').get_text().strip()
         vacancies.append(Vacancy(

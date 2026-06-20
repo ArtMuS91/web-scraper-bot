@@ -37,6 +37,9 @@ Create a `.env` file in the project root:
 ```env
 TELEGRAM_BOT_TOKEN=your_bot_token_here
 TELEGRAM_CHAT_ID=your_chat_id_here
+WEBHOOK_URL=your_webhook_url_here
+PORT=8443
+APP_ENV=local
 ```
 
 ## Usage
