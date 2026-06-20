@@ -7,7 +7,6 @@ UA_MONTHS = {
     "вересня": 9, "жовтня": 10, "листопада": 11, "грудня": 12,
 }
 
-
 def parse_ua_date(text: str) -> date:
     parts = text.strip().split()
     if len(parts) == 2:
@@ -21,3 +20,6 @@ def parse_ua_date(text: str) -> date:
                 d = date(year - 1, month, int(day))
             return d
     return date.min
+
+def date_to_string(date: date) -> str:
+    return date.strftime("%d.%m.%Y")

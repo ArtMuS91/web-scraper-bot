@@ -9,6 +9,7 @@ from telegram.ext import (
 from dotenv import load_dotenv
 
 from scrapers.dou import scrape_dou
+from scrapers.workua import scrape_workua
 
 load_dotenv()
 logging.basicConfig(
@@ -34,11 +35,13 @@ if APP_ENV != "local" and not WEBHOOK_URL:
 TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
 URLS = [
-    {"type": "DOU", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"}
+    {"type": "DOU", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"},
+    {"type": "WORKUA", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"}
 ]
 
 SCRAPERS = {
     "DOU": scrape_dou,
+    "WORKUA": scrape_workua,
 }
 
 def scrape():
@@ -58,6 +61,7 @@ def scrape():
 
         vacancies = scraper(url)
         results.extend(v.to_html(i) for i, v in enumerate(vacancies, start=1))
+        results.append("\n")
 
     return "\n".join(results)
 
