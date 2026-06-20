@@ -32,7 +32,7 @@ def bot_module(monkeypatch):
 def test_parse_ua_date_parses_expected_day_and_month():
     parsed = parse_ua_date("25 березня")
 
-    assert parsed.day == 26
+    assert parsed.day == 25
     assert parsed.month == 3
 
 def test_date_to_string_formats_date():
