@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from models import Vacancy
-from utils import parse_ua_date
+from utils import parse_ua_date, date_to_string
 
 
 def scrape_dou(url: str) -> list[Vacancy]:
@@ -15,15 +15,23 @@ def scrape_dou(url: str) -> list[Vacancy]:
     soup = BeautifulSoup(r.text, "html.parser")
 
     vacancies: list[Vacancy] = []
-    for item in soup.select('.l-vacancy'):
+    for item in soup.select('.l-vacancy', limit=10):
         a_tag = item.select_one('a.vt')
-        date_text = item.select_one('.date').get_text().strip()
+        date_tag = item.select_one('.date')
+        company_tag = item.select_one('.company')
+        
+        if not a_tag or not date_tag or not company_tag:
+            continue
+        
+        date_text = date_tag.get_text().strip()
+        parsed_date = parse_ua_date(date_text)
+        
         vacancies.append(Vacancy(
             title=a_tag.get_text(),
             link=a_tag.get('href'),
-            company=item.select_one('.company').get_text().strip(),
-            date_text=date_text,
-            date=parse_ua_date(date_text),
+            company=company_tag.get_text().strip(),
+            date_text=date_to_string(parsed_date),
+            date=parsed_date,
             is_hot='__hot' in item['class'],
         ))
 
