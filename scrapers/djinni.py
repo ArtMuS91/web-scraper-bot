@@ -17,7 +17,7 @@ def scrape_djinni(url: str) -> list[Vacancy]:
     soup = BeautifulSoup(r.text, "html.parser")
 
     vacancies: list[Vacancy] = []
-    for item in soup.select('.job-item', limit=10):
+    for item in soup.select('.job-item'):
         a_tag = item.select_one('.job_item__header-link')
         company_tag = a_tag.select_one('.small.text-gray-800.opacity-75.font-weight-500') if a_tag else None
         title_tag = a_tag.select_one('h2.job-item__position') if a_tag else None
@@ -51,4 +51,4 @@ def scrape_djinni(url: str) -> list[Vacancy]:
         ))
 
     vacancies.sort(key=lambda v: v.date, reverse=True)
-    return vacancies
+    return vacancies[:10]
