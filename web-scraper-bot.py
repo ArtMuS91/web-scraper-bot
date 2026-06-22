@@ -35,15 +35,17 @@ if APP_ENV != "local" and not WEBHOOK_URL:
 
 TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 
-URLS = [
-    {"type": "DOU", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"},
-    {"type": "WORKUA", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"},
-    {"type": "DJINNI", "url": "https://djinni.co/jobs/?search_type=basic-search&employment=remote&editorial=reservation"},
-]
+URLS = (
+    {"type": "DOU", "title": "Dou", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"},
+    {"type": "WORKUA_REMOTE", "title": "WorkUa", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"},
+    {"type": "WORKUA_KHARKIV", "title": "WorkUa", "url": "https://www.work.ua/jobs-kharkiv-it/?advs=1&deferment=1", "filter": "ремоут, Харків"},
+    {"type": "DJINNI", "title": "Djinni", "url": "https://djinni.co/jobs/?search_type=basic-search&employment=remote&editorial=reservation"},
+)
 
 SCRAPERS = {
     "DOU": scrape_dou,
-    "WORKUA": scrape_workua,
+    "WORKUA_REMOTE": scrape_workua,
+    "WORKUA_KHARKIV": scrape_workua,
     "DJINNI": scrape_djinni
 }
 
@@ -54,13 +56,16 @@ def scrape():
     for entry in URLS:
         url_type = entry["type"]
         url = entry["url"]
-
+        title = entry["title"]
+        filter = "ремоут, з бронюванням" if not entry.get("filter") else entry.get("filter")
+        
         scraper = SCRAPERS.get(url_type)
+        
         if scraper is None:
             print(f"No scraper found for type '{url_type}', skipping.")
             continue
         
-        results.append(f"{url_type} вакансії (ремоут, з бронюванням):\n")
+        results.append(f"<u>{title}</u> вакансії ({filter}):\n")
 
         vacancies = scraper(url)
         results.extend(v.to_html(i) for i, v in enumerate(vacancies, start=1))
