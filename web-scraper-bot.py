@@ -38,7 +38,7 @@ TELEGRAM_CHAT_ID = int(TELEGRAM_CHAT_ID)
 URLS = [
     {"type": "DOU", "title": "Dou", "url": "https://jobs.dou.ua/vacancies/?remote&search=бронювання"},
     {"type": "WORKUA_REMOTE", "title": "WorkUa", "url": "https://www.work.ua/jobs-remote-it/?deferment=1&advs=1"},
-    {"type": "WORKUA_KHARKIV", "title": "WorkUa", "url": "https://www.work.ua/jobs-kharkiv-it/?advs=1&deferment=1", "filter": "ремоут, Харків"},
+    {"type": "WORKUA_KHARKIV", "title": "WorkUa", "url": "https://www.work.ua/jobs-kharkiv-it/?advs=1&deferment=1", "filter": "Харків, з бронюванням"},
     {"type": "DJINNI", "title": "Djinni", "url": "https://djinni.co/jobs/?search_type=basic-search&employment=remote&editorial=reservation"},
 ]
 
