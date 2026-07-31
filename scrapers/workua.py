@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import date, datetime
 
 import requests
@@ -8,6 +9,8 @@ from models import Vacancy
 from utils import date_to_string
 
 SKIP_COMPANIES = ["Nix"]
+
+SCRAPERAPI_KEY = os.getenv("SCRAPERAPI_KEY")
 
 HEADERS = {
     "User-Agent": (
@@ -20,11 +23,18 @@ HEADERS = {
 }
 
 def scrape_workua(url: str) -> list[Vacancy]:
-    r = requests.get(
-        url,
-        timeout=20,
-        headers=HEADERS,
-    )
+    if SCRAPERAPI_KEY:
+        r = requests.get(
+            "https://api.scraperapi.com",
+            params={"api_key": SCRAPERAPI_KEY, "url": url},
+            timeout=60,
+        )
+    else:
+        r = requests.get(
+            url,
+            timeout=20,
+            headers=HEADERS,
+        )
 
     soup = BeautifulSoup(r.text, "html.parser")
 
