@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from datetime import date, datetime
 
 import requests
@@ -22,6 +23,10 @@ HEADERS = {
     "Referer": "https://www.work.ua/",
 }
 
+SCRAPERAPI_RETRY_MARKER = "multiple users connecting from your IP"
+SCRAPERAPI_MAX_ATTEMPTS = 3
+SCRAPERAPI_RETRY_DELAY_SECONDS = 5
+
 def scrape_workua(url: str) -> list[Vacancy]:
     if SCRAPERAPI_KEY:
         r = requests.get(
@@ -29,6 +34,19 @@ def scrape_workua(url: str) -> list[Vacancy]:
             params={"api_key": SCRAPERAPI_KEY, "url": url},
             timeout=60,
         )
+        for attempt in range(2, SCRAPERAPI_MAX_ATTEMPTS + 1):
+            if SCRAPERAPI_RETRY_MARKER not in r.text:
+                break
+            logging.warning(
+                "ScraperAPI concurrency limit hit for %s (attempt %d/%d), retrying in %ds",
+                url, attempt - 1, SCRAPERAPI_MAX_ATTEMPTS, SCRAPERAPI_RETRY_DELAY_SECONDS,
+            )
+            time.sleep(SCRAPERAPI_RETRY_DELAY_SECONDS)
+            r = requests.get(
+                "https://api.scraperapi.com",
+                params={"api_key": SCRAPERAPI_KEY, "url": url},
+                timeout=60,
+            )
     else:
         r = requests.get(
             url,
@@ -40,7 +58,7 @@ def scrape_workua(url: str) -> list[Vacancy]:
 
     items = soup.select('.job-link')
     if not items:
-        logging.warning(
+        logging.error(
             "WorkUa scraper got no '.job-link' items for %s (status=%s, final_url=%s, len=%d). "
             "First 300 chars: %r",
             url, r.status_code, r.url, len(r.text), r.text[:300],
