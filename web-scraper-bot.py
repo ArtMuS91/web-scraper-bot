@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 from scrapers.djinni import scrape_djinni
 from scrapers.dou import scrape_dou
+from scrapers.intellias import scrape_intellias
 from scrapers.softserve import scrape_softserve
 from scrapers.workua import scrape_workua
 
@@ -42,11 +43,17 @@ URLS = [
     {"type": "WORKUA_KHARKIV", "title": "WorkUa", "url": "https://www.work.ua/jobs-kharkiv-it/?advs=1&deferment=1", "filter": "Харків, з бронюванням"},
     {"type": "DJINNI", "title": "Djinni", "url": "https://djinni.co/jobs/?search_type=basic-search&employment=remote&editorial=reservation"},
     {
-     "type": "SOFT_SERVE",
-     "title": "SoftServe",
-     "url": "https://career.softserveinc.com/uk-ua/vacancies/country-ukraine/position-senior,lead/q-Net%20angular%20react",
-     "filter": "ремоут"
-     },
+        "type": "SOFT_SERVE",
+        "title": "SoftServe",
+        "url": "https://career.softserveinc.com/uk-ua/vacancies/country-ukraine/position-senior,lead/q-Net%20angular%20react",
+        "filter": "ремоут"
+    },
+    {
+        "type": "INTELLIAS",
+        "title": "Intellias",
+        "url": "https://career.intellias.com/vacancies/job-profile_net-engineer-and-location_ukraine",
+        "filter": "ремоут"
+    },
 ]
 
 SCRAPERS = {
@@ -54,7 +61,8 @@ SCRAPERS = {
     "WORKUA_REMOTE": scrape_workua,
     "WORKUA_KHARKIV": scrape_workua,
     "DJINNI": scrape_djinni,
-    "SOFT_SERVE": scrape_softserve
+    "SOFT_SERVE": scrape_softserve,
+    "INTELLIAS": scrape_intellias
 }
 
 def scrape():
