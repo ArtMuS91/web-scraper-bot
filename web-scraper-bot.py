@@ -83,7 +83,12 @@ def scrape():
         
         results.append(f"<u>{title}</u> вакансії ({filter}):\n")
 
-        vacancies = scraper(url)
+        try:
+            vacancies = scraper(url)
+        except Exception:
+            logging.exception("Scraper '%s' failed for %s", url_type, url)
+            results.append("⚠️ Не вдалося отримати вакансії\n")
+            continue
         results.extend(v.to_html(i) for i, v in enumerate(vacancies, start=1))
         results.append("\n")
 
