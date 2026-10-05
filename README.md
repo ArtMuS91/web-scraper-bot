@@ -65,15 +65,16 @@ SCRAPERAPI_KEY=your_scraperapi_key_here
 | `WEBHOOK_URL` | Public webhook URL (required unless `APP_ENV=local`) |
 | `PORT` | Port for the webhook server (default `8443`) |
 | `APP_ENV` | `local` uses polling; any other value (default `production`) uses a webhook |
-| `SCRAPERAPI_KEY` | Optional [ScraperAPI](https://www.scraperapi.com/) key used by the work.ua scraper (see below) |
+| `SCRAPERAPI_KEY` | Optional [ScraperAPI](https://www.scraperapi.com/) key used by the work.ua and some custom scrapers (see below) |
 
 ### Why `SCRAPERAPI_KEY`
 
-work.ua blocks direct requests from the hosting server, so the scraper got back pages with no vacancies.
-When `SCRAPERAPI_KEY` is set, the work.ua scraper sends its requests through ScraperAPI to get around the block.
-If ScraperAPI replies that too many users are connecting from the same IP (its concurrency limit), the scraper
-waits 5 seconds and tries again, up to 3 attempts in total. Without the key, work.ua is requested directly, which
-usually works fine when running locally.
+work.ua and some custom (behind Imperva bot protection) block direct requests from the hosting server: work.ua
+returns pages with no vacancies, custom career stire returns a non-JSON challenge page. When `SCRAPERAPI_KEY` is set, these
+scrapers send their requests through ScraperAPI (`scrapers/fetch.py`) to get around the block.
+If ScraperAPI fails with a 5xx error (common for protected sites, and not billed) or replies that too many users
+are connecting from the same IP (its concurrency limit), the request waits 5 seconds and tries again, up to
+3 attempts in total. Without the key, the sites are requested directly, which usually works fine when running locally.
 
 ## Deployment
 

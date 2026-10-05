@@ -2,9 +2,8 @@ import logging
 from datetime import date
 from urllib.parse import unquote, urlparse
 
-import requests
-
 from models import Vacancy
+from scrapers.fetch import fetch
 
 BASE_URL = "https://career.softserveinc.com"
 API_URL = f"{BASE_URL}/api/frontend/vacancies"
@@ -45,13 +44,14 @@ def scrape_softserve(url: str) -> list[Vacancy]:
 
     items: list[dict] = []
     for page in range(1, MAX_PAGES + 1):
-        r = requests.get(
-            API_URL,
-            params=[*params, ("page", str(page))],
-            timeout=20,
-            headers=HEADERS,
-        )
+        r = fetch(API_URL, params=[*params, ("page", str(page))], headers=HEADERS)
         r.raise_for_status()
+        if "application/json" not in r.headers.get("Content-Type", ""):
+            # Imperva bot protection answers datacenter IPs with a 200 HTML challenge page
+            raise RuntimeError(
+                f"SoftServe API returned non-JSON response "
+                f"(Content-Type={r.headers.get('Content-Type')!r}, body={r.text[:200]!r})"
+            )
         payload = r.json()
 
         items.extend(payload["data"]["vacancies"])
