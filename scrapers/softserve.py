@@ -44,10 +44,11 @@ def scrape_softserve(url: str) -> list[Vacancy]:
 
     items: list[dict] = []
     for page in range(1, MAX_PAGES + 1):
-        r = fetch(API_URL, params=[*params, ("page", str(page))], headers=HEADERS)
+        # Imperva answers plain requests with a JavaScript challenge, so ScraperAPI has to render it
+        r = fetch(API_URL, params=[*params, ("page", str(page))], headers=HEADERS, render=True)
         r.raise_for_status()
         if "application/json" not in r.headers.get("Content-Type", ""):
-            # Imperva bot protection answers datacenter IPs with a 200 HTML challenge page
+            # Imperva bot protection answers with a 200 HTML challenge page when it isn't solved
             raise RuntimeError(
                 f"SoftServe API returned non-JSON response "
                 f"(Content-Type={r.headers.get('Content-Type')!r}, body={r.text[:200]!r})"

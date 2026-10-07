@@ -74,7 +74,8 @@ returns pages with no vacancies, custom career stire returns a non-JSON challeng
 scrapers send their requests through ScraperAPI (`scrapers/fetch.py`) to get around the block.
 If ScraperAPI fails with a 5xx error (common for protected sites, and not billed) or replies that too many users
 are connecting from the same IP (its concurrency limit), the request waits 5 seconds and tries again, up to
-3 attempts in total. Without the key, the sites are requested directly, which usually works fine when running locally.
+3 attempts in total. Some scraper also sets `render=true`, because Imperva answers with a JavaScript
+challenge that only a headless browser can pass (10 credits per request instead of 1). Without the key, the sites are requested directly, which usually works fine when running locally.
 
 ## Deployment
 
